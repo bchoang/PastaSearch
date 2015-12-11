@@ -1,0 +1,121 @@
+<head>
+    <link rel="stylesheet" href="flat-ui/dist/css/vendor/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="flat-ui/dist/css/flat-ui.min.css" type="text/css">
+
+    <script type="text/javascript" src="flat-ui/dist/js/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="flat-ui/dist/js/flat-ui.min.js"></script>
+    <script src="zeroclipboard/dist/ZeroClipboard.min.js"></script>
+
+    <style>
+        .waiting-spinner {
+            background: url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
+            background-position: 95%;
+        }
+        .container{
+            text-align:center;
+        }
+        .searchArea{
+            padding-top: 10px;
+            padding-bottom: 20px;
+        }
+        .result{
+            background-color: #f7f7f9;
+            border: 2px solid #e1e1e8;
+            border-radius: 5px;
+            list-style-type: none;
+            margin-bottom: 5px;
+            position: relative;
+
+            padding: 15px 21px;
+        }
+        .pasta-button{
+            width: 5px;
+            height: 5px;
+            position: absolute;
+            top: 0;
+            right: 0px;
+            margin:0px;
+        }
+        .pasta-button.zeroclipboard-is-hover{
+        }
+        #search{
+            display: inline;
+            width: 200px;
+            padding-right: 25px;
+            margin: 0;
+        }
+        #searchBtn{
+            display: inline;
+            width: 50px;
+            margin:0;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1> pasta search </h1>
+        <div class="searchArea">
+            <input type="text" class="form-control" id="search" placeholder="go0D SHIT" />
+            <button id="searchBtn" class="btn btn-primary">get</button>
+        </div>
+
+        <div class="pasta">
+            <ul class="results">
+
+            </ul>
+        </div>
+
+        <button class="btn btn-default" id="next">more</button>
+
+    </div>
+</body>
+
+<script>
+
+$("document").ready(function (){
+    var queryWaitTime = 0200; // wait 1 second
+    var currentPage = 0;
+
+    var lastTimeout;
+    $("#search").keypress(function (){
+
+        clearTimeout(lastTimeout);
+        $("#search").addClass("waiting-spinner");
+        lastTimeout = setTimeout(function(){
+
+            $("#search").removeClass("waiting-spinner");
+
+            var input = $('#search').val();
+            $.get("/get?searchText=" + input, function (data){
+                $(".results").empty();
+                for (var i = 0, l = data.length; i < l; i ++){
+                    var currentPasta = data[i].selftext;
+
+                    $(".results").append("<li class='result'><button class='btn pasta-button' data-clipboard-text='"+currentPasta+"'><span class='fui-clip' style='font-size:.6em;top:-.35em;left:-.6em'></span></button>" + currentPasta + "</li>");
+                }
+            });
+
+        }, queryWaitTime);
+    });
+
+    $('#next').click(function (){
+        currentPage ++;
+
+        var input = $('#search').val();
+        $.get("/get?searchText=" + input + "&page=" + currentPage, function (data){
+            for (var i = 0, l = data.length; i < l; i ++){
+                var currentPasta = data[i].selftext;
+
+                    $(".results").append("<li class='result'><button class='btn pasta-button' data-clipboard-text='"+currentPasta+"'><span class='fui-clip' style='font-size:.6em;top:-.35em;left:-.6em'></span></button>" + currentPasta + "</li>");
+            }
+        });
+    });
+});
+
+$(document).ajaxComplete(function(){
+    var clip = new ZeroClipboard($('.pasta-button'));
+});
+
+
+</script>
