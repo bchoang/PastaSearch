@@ -46,5 +46,5 @@ function fetchData (url, next, timesLeft){
     });
 }
 
-var baseURL = "https://www.reddit.com/r/copypasta/top.json?sort=top&t=all";
+var baseURL = "https://www.reddit.com/r/copypasta+emojipasta+goodshitpasta+dickcember/top.json?sort=top&t=all";
 fetchData(baseURL, "", 15);
