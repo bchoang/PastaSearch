@@ -8,7 +8,8 @@ router.get('/', function(req, res, next) {
 });
 
 var pg = require('pg');
-var conString = "postgres://jackson:________@localhost/copypasta";
+
+var conString = require('fs').readFileSync(require('path').join(__dirname, 'private/pgstring.txt'))';
 
 router.get('/get', function (req, res, next){
     var searchText = req.query.searchText;
