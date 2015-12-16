@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 
 var pg = require('pg');
 
-var conString = require('fs').readFileSync(require('path').join(__dirname, 'private/pgstring.txt'))';
+var conString = require('fs').readFileSync(require('path').join(__dirname, '../private/pgstring.txt')).toString();
 
 router.get('/get', function (req, res, next){
     var searchText = req.query.searchText;

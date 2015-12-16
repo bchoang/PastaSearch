@@ -1,7 +1,7 @@
 var pg = require('pg');
 var request = require('request');
 
-var conString = require('fs').readFileSync(require('path').join(__dirname, 'private/pgstring.txt'))';
+var conString = require('fs').readFileSync(require('path').join(__dirname, 'private/pgstring.txt')).toString();
 
 // this initializes a connection pool
 // it will keep idle connections open for a (configurable) 30 seconds
