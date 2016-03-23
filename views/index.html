@@ -57,7 +57,8 @@
         <h1> pasta search </h1>
         <div class="searchArea">
             <input type="text" class="form-control" id="search" placeholder="go0D SHIT" />
-            <button id="searchBtn" class="btn btn-primary">get</button>
+            <button id="searchBtn" class="btn btn-primary">🍆</button>
+            <button id="searchBtn" class="btn btn-primary">🍝</button>
         </div>
 
         <div class="pasta">
@@ -85,33 +86,50 @@ $("document").ready(function (){
         lastTimeout = setTimeout(function(){
 
             $("#search").removeClass("waiting-spinner");
-
-            var input = $('#search').val();
-            $.get("/get?searchText=" + input, function (data){
-                $(".results").empty();
-                for (var i = 0, l = data.length; i < l; i ++){
-                    var currentPasta = data[i].selftext;
-
-                    $(".results").append("<li class='result'><button class='btn pasta-button' data-clipboard-text='"+currentPasta+"'><span class='fui-clip' style='font-size:.6em;top:-.35em;left:-.6em'></span></button>" + currentPasta + "</li>");
-                }
-            });
+            $(".results").empty();
+            currentPage = 0;
+            search(currentPage);
 
         }, queryWaitTime);
     });
 
     $('#next').click(function (){
+
         currentPage ++;
+        search(currentPage);
 
-        var input = $('#search').val();
-        $.get("/get?searchText=" + input + "&page=" + currentPage, function (data){
-            for (var i = 0, l = data.length; i < l; i ++){
-                var currentPasta = data[i].selftext;
-
-                    $(".results").append("<li class='result'><button class='btn pasta-button' data-clipboard-text='"+currentPasta+"'><span class='fui-clip' style='font-size:.6em;top:-.35em;left:-.6em'></span></button>" + currentPasta + "</li>");
-            }
-        });
     });
 });
+
+function search(currentPage){
+
+        var input = $('#search').val();
+        var inputs = input.split(' ');
+
+        $.get("/get?searchText=" + input + "&page=" + currentPage, function (data){
+            for (var i = 0, l = data.length; i < l; i ++){
+                var selftext = data[i].selftext;
+                var selftextarray = selftext.split(' ');
+                var boldedtext = '';
+                for (var j = 0, m = selftextarray.length; j < m; j ++){
+                    var current = selftextarray[j];
+                    if (inputs.indexOf(current) == -1){
+                        boldedtext += current + ' ';
+                    }else{
+                        boldedtext += ("<strong style='font-size:1.6em;text-decoration:underline;'>" + current + '</strong> ');
+                    }
+                }
+                $(".results").append("<li class='result'><button class='btn pasta-button' data-clipboard-text='"+selftext+"'><span class='fui-clip' style='font-size:.6em;top:-.35em;left:-.6em'></span></button>" + boldedtext + "</li>");
+            }
+        });
+}
+
+function arrayContainsString (st, ar){
+    for (var i = 0, l = ar.length; i < l; i ++){
+        if (ar[i].indexOf(st) > -1) return true;
+    }
+    return false;
+}
 
 $(document).ajaxComplete(function(){
     var clip = new ZeroClipboard($('.pasta-button'));

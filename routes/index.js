@@ -20,15 +20,20 @@ router.get('/get', function (req, res, next){
     var queryText = "SELECT selftext FROM posts WHERE selftext SIMILAR TO $1 ORDER BY score DESC LIMIT 10";
     if (page) queryText += "OFFSET " + page*10;
 
+    var firstWord = "select index.id, index.occurances, index.word, posts.selftext, posts.score, posts.id from index, posts where word = '"+ searchText.split(' ')[0] +"' and index.id = posts.id order by occurances DESC LIMIT 10";
+    if (page) firstWord += " OFFSET " + page*10 + ";";
+//    var firstWord = "select id, occurances, word from index where word = '"+ searchText.split(' ')[0]  +"' order by occurances desc;"
+    console.log(firstWord);
     pg.connect(conString, function(err, client, done) {
         if(err) return console.error('error fetching client from pool', err);
     
-        client.query(queryText, [pattern], function(err, result) {
-            done(); //call `done()` to release the client back to the pool
-            if(err) return console.error('error running query', err);
+        client.query(firstWord, function(err, result) {
+            if(err) return console.log('\t' +  err);
 
             if (result.rows[0])
             res.send(result.rows);
+            done(); //call `done()` to release the client back to the pool
+
         });
     });
 });
